@@ -7,8 +7,9 @@ pygame.init()
 
 resolution = (500, 500) #tamanho de 500 pixels por 500 pixels
 screen = pygame.display.set_mode(resolution) #criamos a tela
-preto = (0, 0, 0) # definimos uma cor preta. Modelo RGB que vai de 0 a 250
+preto = (20, 20, 20) # definimos uma cor preta. Modelo RGB que vai de 0 a 250
 screen.fill(preto) # definimos a cor da tela
+clock = pygame.time.Clock()#restringir o FPS, caso contrário cada máquina teria uma velocidade diferente
 
 class Snake:
     cor = (255, 255, 255)
@@ -32,22 +33,28 @@ class Snake:
         y = cabeca[1]
 
         if self.direcao == "direita":
-            self.corpo[0] = (x + self.velocidade , y)
+            self.corpo.insert(0, (x + self.velocidade , y))
         elif self.direcao == "esquerda":
-            self.corpo[0] = (x - self.velocidade , y)
+            self.corpo.insert(0, (x - self.velocidade , y))
         elif self.direcao == "cima":
-            self.corpo[0] = (x , y - self.velocidade)
+            self.corpo.insert(0, (x , y - self.velocidade))
         elif self.direcao == "baixo":
-            self.corpo[0] = (x , y + self.velocidade)
+            self.corpo.insert(0, (x , y + self.velocidade))
+
+        self.corpo.pop(-1)
 
     def cima(self):
-        self.direcao = "cima"
+        if self.direita != "baixo":
+            self.direcao = "cima"
     def baixo(self):
-        self.direcao = "baixo"
+        if self.direcao != "cima":
+            self.direcao = "baixo"
     def esquerda(self):
-        self.direcao = "esquerda"
+        if self.direcao != "direita":
+            self.direcao = "esquerda"
     def direita(self):
-        self.direcao = "direita"
+        if self.direcao != "esquerda":
+            self.direcao = "direita"
 
 class Fruta: #criamos uma classe pra fruta
     cor = (255, 0 , 0)
@@ -67,7 +74,7 @@ frutinha = Fruta() #Instanciamos a fruta
 cobrinha = Snake()
 
 while True:
-    time.sleep(0.1)
+    clock.tick(20) #limitanto pra 20 fps
     for event in pygame.event.get():
         if event.type == pygame.QUIT:#Botão de fechar o jogo
             exit()
@@ -75,12 +82,16 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 cobrinha.cima()
+                break
             if event.key == pygame.K_DOWN:
                 cobrinha.baixo()
+                break
             if event.key == pygame.K_LEFT:
                 cobrinha.esquerda()
+                break
             if event.key == pygame.K_RIGHT:
                 cobrinha.direita()
+                break
 
     cobrinha.andar()
 
