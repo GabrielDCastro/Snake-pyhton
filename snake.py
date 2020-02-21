@@ -56,6 +56,22 @@ class Snake:
         if self.direcao != "esquerda":
             self.direcao = "direita"
 
+    def colisao_frutinha(self, frutinha):
+        return self.corpo[0] == frutinha.posicao
+
+    def comer(self):
+        self.corpo.append((0, 0))
+
+    def colisao_parede(self):
+        cabeca = self.corpo[0]
+        x = cabeca[0]
+        y = cabeca[1]
+
+        return x < 0 or y < 0 or x > 490 or y > 490
+
+    def auto_colisao(self):
+        return self.corpo[0] in self. corpo[1:] # se a cabeça (corpo[0]) encostar no resto (corpo1:) ele colide e perde
+
 class Fruta: #criamos uma classe pra fruta
     cor = (255, 0 , 0)
     tamanho = (10, 10)
@@ -93,8 +109,19 @@ while True:
                 cobrinha.direita()
                 break
 
-    cobrinha.andar()
 
+
+    if cobrinha.colisao_frutinha(frutinha):
+        cobrinha.comer()
+        frutinha = Fruta()
+
+    if cobrinha.colisao_parede():
+        cobrinha = Snake()
+
+    if cobrinha.auto_colisao():
+        cobrinha = Snake()
+        
+    cobrinha.andar()
     screen.fill(preto)
     frutinha.blit(screen)
     cobrinha.blit(screen)
