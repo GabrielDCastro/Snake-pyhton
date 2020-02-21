@@ -31,14 +31,23 @@ class Snake:
         x =cabeca[0]
         y = cabeca[1]
 
-        if self.direcao == 'direita':
+        if self.direcao == "direita":
             self.corpo[0] = (x + self.velocidade , y)
-        elif self.direcao == 'esquerda':
+        elif self.direcao == "esquerda":
             self.corpo[0] = (x - self.velocidade , y)
-        elif self.direcao == 'cima':
+        elif self.direcao == "cima":
             self.corpo[0] = (x , y - self.velocidade)
-        elif self.direcao == 'baixo':
+        elif self.direcao == "baixo":
             self.corpo[0] = (x , y + self.velocidade)
+
+    def cima(self):
+        self.direcao = "cima"
+    def baixo(self):
+        self.direcao = "baixo"
+    def esquerda(self):
+        self.direcao = "esquerda"
+    def direita(self):
+        self.direcao = "direita"
 
 class Fruta: #criamos uma classe pra fruta
     cor = (255, 0 , 0)
@@ -62,6 +71,16 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:#Botão de fechar o jogo
             exit()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                cobrinha.cima()
+            if event.key == pygame.K_DOWN:
+                cobrinha.baixo()
+            if event.key == pygame.K_LEFT:
+                cobrinha.esquerda()
+            if event.key == pygame.K_RIGHT:
+                cobrinha.direita()
 
     cobrinha.andar()
 
