@@ -1,5 +1,4 @@
 import random
-import time
 
 import pygame
 
@@ -21,6 +20,7 @@ class Snake:
         self.textura.fill(self.cor)
         self.corpo = [(100, 100), (90, 100)]
         self.direcao = 'direita' # a direção muda, por isso coloca ela no init e não nos atributos base
+        self.ponto = 0
 
     def blit(self, screen):
         for posicao in self.corpo: #mostrando todos os blocos do corpo
@@ -33,18 +33,18 @@ class Snake:
         y = cabeca[1]
 
         if self.direcao == "direita":
-            self.corpo.insert(0, (x + self.velocidade , y))
+            self.corpo.insert(0, (x + self.velocidade, y))
         elif self.direcao == "esquerda":
-            self.corpo.insert(0, (x - self.velocidade , y))
+            self.corpo.insert(0, (x - self.velocidade, y))
         elif self.direcao == "cima":
-            self.corpo.insert(0, (x , y - self.velocidade))
+            self.corpo.insert(0, (x, y - self.velocidade))
         elif self.direcao == "baixo":
-            self.corpo.insert(0, (x , y + self.velocidade))
+            self.corpo.insert(0, (x, y + self.velocidade))
 
         self.corpo.pop(-1)
 
     def cima(self):
-        if self.direita != "baixo":
+        if self.direcao != "baixo":
             self.direcao = "cima"
     def baixo(self):
         if self.direcao != "cima":
@@ -61,6 +61,8 @@ class Snake:
 
     def comer(self):
         self.corpo.append((0, 0))
+        self.ponto += 1
+        pygame.display.set_caption("Snake | Pontos: {}".format(self.ponto))
 
     def colisao_parede(self):
         cabeca = self.corpo[0]
@@ -76,18 +78,26 @@ class Fruta: #criamos uma classe pra fruta
     cor = (255, 0 , 0)
     tamanho = (10, 10)
 
-    def __init__(self):
+    def __init__(self, cobrinha):
         self.textura = pygame.Surface(self.tamanho) #modo que o pygame define o objeto
         self.textura.fill(self.cor)
+        self.posicao = Fruta.criar_posicao(cobrinha)
+
+    @staticmethod
+    def criar_posicao(cobrinha):
         x = random.randint(0, 49) * 10
         y = random.randint(0, 49) * 10
-        self.posicao = (x, y)
+
+        if (x,y) in cobrinha.corpo:
+            Fruta.criar_posicao(cobrinha)
+        else:
+            return x,y
 
     def blit(self, screen):
         screen.blit(self.textura, self.posicao)  # colocamos a fruta na tela
 
-frutinha = Fruta() #Instanciamos a fruta
 cobrinha = Snake()
+frutinha = Fruta(cobrinha) #Instanciamos a fruta
 
 while True:
     clock.tick(20) #limitanto pra 20 fps
@@ -99,13 +109,13 @@ while True:
             if event.key == pygame.K_UP:
                 cobrinha.cima()
                 break
-            if event.key == pygame.K_DOWN:
+            elif event.key == pygame.K_DOWN:
                 cobrinha.baixo()
                 break
-            if event.key == pygame.K_LEFT:
+            elif event.key == pygame.K_LEFT:
                 cobrinha.esquerda()
                 break
-            if event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT:
                 cobrinha.direita()
                 break
 
@@ -113,14 +123,14 @@ while True:
 
     if cobrinha.colisao_frutinha(frutinha):
         cobrinha.comer()
-        frutinha = Fruta()
+        frutinha = Fruta(cobrinha)
 
     if cobrinha.colisao_parede():
         cobrinha = Snake()
 
     if cobrinha.auto_colisao():
         cobrinha = Snake()
-        
+
     cobrinha.andar()
     screen.fill(preto)
     frutinha.blit(screen)
